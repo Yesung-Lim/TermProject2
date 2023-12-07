@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const memberController = require("./routers/memberController");
 const houseController = require("./routers/houseController");
 const { generateDummyData } = require("./faker");
+const reservationController = require("./routers/reservationController");
+const commentController = require("./routers/commentController");
 
 const app = express();
 const hostname = "localhost";
@@ -25,6 +27,8 @@ const server = async () => {
     app.use(express.urlencoded({ extended: false }));
     app.use("/member", memberController);
     app.use("/house", houseController);
+    app.use("/reservation", reservationController);
+    app.use("/comment", commentController);
     app.listen(port, hostname, function () {
       console.log(`Server running at http://${hostname}:${port}/`);
     });
