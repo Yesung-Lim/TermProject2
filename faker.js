@@ -50,14 +50,21 @@ const calcCharge = (house, checkin, days) => {
 const generateDummyData = async () => {
   const numOfGuest = 10;
   const numOfHost = 4;
-  const numOfConvenience = 4;
-  const numOfReservation = 4;
+  const numOfHouse = 10;
+  const numOfReservation = 5;
   const houseName = [
-    "힐링하우스 운일암",
-    "제주공항 인근 펜션",
-    "노르웨이숲 인근 펜션",
-    "용문산 별장",
+    "산들바람 휴식공간",
+    "에메랄드 하버 리트리트",
+    "소나무 채우는 집",
+    "해맞이 오션 레트릿",
+    "푸른 언덕 하우스",
+    "신비로운 숲속 쉼터",
+    "물결 소리의 휴식장",
+    "푸른 하늘의 뷰하우스",
+    "동화 속 작은 집",
+    "식물원 테라스 레지던스",
   ];
+
   const guests = [];
   const hosts = [];
   const houses = [];
@@ -99,7 +106,7 @@ const generateDummyData = async () => {
   }
 
   // 각 Host마다 숙소 생성
-  for (let i = 0; i < numOfHost; i++) {
+  for (let i = 0; i < numOfHouse; i++) {
     const weekday = 20000 + Math.round(Math.random() * 1000) * 100;
     const capacity = 5 + Math.round(Math.random() * 5);
 
@@ -118,7 +125,7 @@ const generateDummyData = async () => {
           weekday,
           weekend: weekday + 10000,
         },
-        member: hosts[i],
+        member: hosts[Math.floor(Math.random() * numOfHost)],
         capacity,
         houseType: i < numOfHost / 2 ? HouseTypes.WHOLE : HouseTypes.PRIVATE,
         numOfBath: 1 + Math.round((Math.random() * capacity) / 2),
@@ -129,6 +136,7 @@ const generateDummyData = async () => {
 
   // 숙소의 카테고리 설정
   houses.map(async (house) => {
+    const numOfConvenience = Math.round(Math.random() * 5);
     const newConvenience = new Convenience({
       house,
       category: getRandomConvenienceTypes(numOfConvenience),
@@ -175,6 +183,7 @@ const generateDummyData = async () => {
     }
   });
 
+  // 숙소 켈린더
   reservations.map(async (reservation) => {
     const startDate = new Date(reservation.checkin);
     while (startDate < reservation.checkout) {
@@ -195,7 +204,7 @@ const generateDummyData = async () => {
 
   // 리뷰 작성
   for (let i = 0; i < reservations.length; i++) {
-    if (i % numOfReservation > numOfReservation / 2 - 1) continue;
+    if (i % numOfReservation > Math.round(numOfReservation / 2 - 1)) continue;
 
     comments.push(
       new Comment({
