@@ -7,15 +7,18 @@ const { Comment } = require("../models/comment");
 router.post("/", async (req, res) => {
   console.log("요청이 도착했습니다:", req.body);
   try {
-    const { guestId, reserveId, starPoint, comment } = req.body; // 수정: 변수명 변경
+    const { guestId, reserveId, starPoint, comment } = req.body;
 
     // 예약 정보 가져오기
-    const reservation = await Reservation.findById(reserveId); // 수정: 변수명 변경
+    const reservation = await Reservation.findById(reserveId);
 
     if (!reservation) {
       return res.status(404).json({ message: "예약을 찾을 수 없습니다." });
     }
-
+    // 예약한 사용자와 현재 요청한 사용자가 일치하는지 확인
+    if (String(reservation.member) !== guestId) {
+      return res.status(403).json({ message: "예약한 사용자가 아닙니다." });
+    }
     // 현재 날짜와 체크아웃 날짜 비교
     const currentDate = new Date();
     const checkoutDate = new Date(reservation.checkout);
