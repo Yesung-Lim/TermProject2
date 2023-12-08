@@ -140,5 +140,53 @@ router.delete("/cancle", async (req, res) => {
     res.status(500).json({ message: "예약 취소 실패", error: err.message });
   }
 });
+router.get("/", async (req, res) => {
+  const { guestId, findType } = req.query;
+  console.log(req.query);
+  try {
+    let reservations;
+    let totalCount;
+    const currentDate = new Date();
+    switch (findType) {
+      case "all":
+        reservations = await Reservation.find({ member: guestId })
+          .populate("house")
+          .sort({ checkin: -1 }); // 체크인 날짜 기준으로 내림차순 정렬
+        totalCount = await Reservation.countDocuments({ member: guestId });
+        break;
+      case "oncoming":
+        reservations = await Reservation.find({
+          member: guestId,
+          checkout: { $lt: currentDate },
+        })
+          .populate("house")
+          .sort({ checkin: -1 }); // 체크인 날짜 기준으로 내림차순 정렬
+        totalCount = await Reservation.countDocuments({
+          member: guestId,
+          checkin: { $lt: new Date() },
+        });
+        break;
+      case "terminated":
+        reservations = await Reservation.find({
+          member: guestId,
+          checkin: { $gt: new Date() },
+        })
+          .populate("house")
+          .sort({ checkin: -1 }); // 체크인 날짜 기준으로 내림차순 정렬
+        totalCount = await Reservation.countDocuments({
+          member: guestId,
+          checkin: { $gt: new Date() },
+        });
+        break;
+      default:
+        return res
+          .status(400)
+          .json({ message: "올바르지 않은 findType입니다." });
+    }
 
+    res.status(200).json({ totalCount, reservations });
+  } catch (err) {
+    res.status(500).json({ message: "예약 조회 실패", error: err.message });
+  }
+});
 module.exports = router;
