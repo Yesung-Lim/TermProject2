@@ -36,7 +36,7 @@ router.post("/", async (req, res) => {
     if (!houseDetails) {
       return res
         .status(404)
-        .json({ message: "숙소를 찾을 수 없습니다." }, houseDetails);
+        .json({ message: "숙소를 찾을 수 없습니다." , houseDetails});
     }
 
     const weekdayRate = houseDetails.charge.weekday;
@@ -189,4 +189,40 @@ router.get("/", async (req, res) => {
     res.status(500).json({ message: "예약 조회 실패", error: err.message });
   }
 });
+
+router.get("/byhouse/:houseId/:year/:month", async (req, res) => 
+{
+  const houseId = req.params.houseId;
+  const year = parseInt(req.params.year);
+  const month = parseInt(req.params.month);
+
+  try 
+  {
+    const reservations = await Reservation.find
+    ({
+      house: houseId,
+      $expr: 
+      {
+        $and: 
+        [
+          { $eq: [{ $year: "$checkin" }, year] },
+          { $eq: [{ $month: "$checkin" }, month] },
+        ],
+      },
+    })
+      .populate("house")
+      .sort({ checkin: -1 });
+
+    if (reservations.length === 0) 
+    {
+      return res.status(404).json({ message: "해당 숙소에 대한 해당 월의 예약이 없습니다." });
+    }
+    res.status(200).json({ reservations });
+  } 
+  catch (err) 
+  {
+    res.status(500).json({ message: "예약 조회 실패", error: err.message });
+  }
+});
+
 module.exports = router;

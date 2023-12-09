@@ -2,6 +2,7 @@ const axios = require("axios");
 
 console.log("client is running...");
 
+
 const getAvailableHouses = async (checkin, checkout, numOfGuest, houseType) => 
 {
     try 
@@ -73,6 +74,16 @@ const getHouseDetail = async (houseId, month) =>
         }
   
         console.log(`${month} 예약 현황:`);
+        const reservationResponse = await axios.get(`http://localhost:3000/reservation/byhouse/${houseId}/2023/${month}`);
+        const reservations = reservationResponse.data.reservations;
+        
+        reservations.forEach((reservation) => {
+            console.log(`체크인: ${reservation.checkin}`);
+            console.log(`체크아웃: ${reservation.checkout}`);
+            console.log(`인원 수: ${reservation.numOfGuest}`);
+            console.log("=====================");
+        });
+
     }
     catch (error) 
     {
@@ -133,17 +144,11 @@ const getReservationHistory = async (guestId, findType) =>
         if (response.ok) 
         {
             console.log('[숙박 완료 리스트]');
-            console.log('숙소명\t\t\t체크인\t\t체크아웃\t요금\t후기');
+            console.log('숙소명\t\t\t체크인\t\t\t\t체크아웃\t\t\t요금\t후기');
         
             data.reservations.forEach((reservation) => 
             {
-                const checkinDate = new Date(reservation.checkin);
-                const checkoutDate = new Date(reservation.checkout);
-                const formattedCheckin = `${checkinDate.getFullYear()}. ${checkinDate.getMonth() + 1}. ${checkinDate.getDate()}`;
-                const formattedCheckout = `${checkoutDate.getFullYear()}. ${checkoutDate.getMonth() + 1}. ${checkoutDate.getDate()}`;
-                const formattedCharge = new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(reservation.charge);
-  
-                console.log(`${reservation.house.name}\t${formattedCheckin}\t${formattedCheckout}\t${formattedCharge}\t${reservation.review ? 'O' : 'X'}`);
+                console.log(`${reservation.house.name}\t${reservation.checkin}\t${reservation.checkout}\t${reservation.charge}\t${reservation.comment ? 'O' : 'X'}`);
             });
         } 
         else 
@@ -156,36 +161,42 @@ const getReservationHistory = async (guestId, findType) =>
         console.error('예약 내역 조회 중 에러 발생:', error.message);
     }
 };
-
-const addComments = async (guestId, reserveId, starPoint, comment) => {
+const addComments = async (guestId, reserveId, starPoint, comment) => 
+{
     try {
         // 게스트의 전체 예약 조회
         const response = await fetch(`http://localhost:3000/reservation?guestId=${guestId}&findType=all`);
         const data = await response.json();
 
-        if (!response.ok) {
+        if (!response.ok) 
+        {
             console.error('예약 정보를 가져오는데 실패했습니다:', data.message);
             return;
         }
 
         const reservation = data.reservations.find(res => res._id === reserveId);
 
-        if (!reservation) {
+        if (!reservation) 
+        {
             console.error('해당 예약을 찾을 수 없습니다.');
             return;
         }
 
-        if (reservation.comment) {
+        if (reservation.comment) 
+        {
             console.error('이미 후기가 등록되었습니다.');
             return;
         }
 
-        const reviewResponse = await fetch(`http://localhost:3000/comment`, {
+        const reviewResponse = await fetch(`http://localhost:3000/comment`, 
+        {
             method: 'POST',
-            headers: {
+            headers: 
+            {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
+            body: JSON.stringify
+            ({
                 guestId,
                 reserveId,
                 starPoint,
@@ -195,21 +206,26 @@ const addComments = async (guestId, reserveId, starPoint, comment) => {
 
         const reviewData = await reviewResponse.json();
 
-        if (reviewResponse.ok) {
+        if (reviewResponse.ok) 
+        {
             console.log('후기 등록 성공:', reviewData);
-        } else {
+        } 
+        else 
+        {
             console.error('후기 등록 실패:', reviewData.message);
         }
-    } catch (error) {
+    }
+    catch (error) 
+    {
         console.error('후기 등록 중 에러 발생:', error.message);
     }
 };
 
 
-//getAvailableHouses("2023-11-01", "2023-11-05", 2, "WHOLE");
-//getHouseDetail("6573139929a76d9482836266", 11); //예약현황 달력형식 추가 필요
-//bookHouse("6573139929a76d9482836259", "6573139929a76d9482836266","2023-12-01", "2023-12-05", 3);
-//bookHouse("6573139929a76d9482836259", "6573139929a76d9482836261","2023-12-06", "2023-12-10", 3);
+//getAvailableHouses("2023-12-20", "2023-11-25", 2, "WHOLE");
+//getHouseDetail("6574853179b6daa5acf79749", 12); //예약현황 달력형식 추가 필요
+//bookHouse("6573139929a76d9482836259", "6574853179b6daa5acf79749","2023-12-01", "2023-12-05", 3);
+//bookHouse("6574853179b6daa5acf7973b", "6574853179b6daa5acf79749","2023-12-06", "2023-12-10", 3);
 //cancelReserve("6572ed198c9f166ec1952718");
-//getReservationHistory("6573139929a76d9482836259", "all");
-//addComments("6573139929a76d9482836259", "6573146629a76d948283639f", 4, "good");
+//getReservationHistory("65746638f2ab684128e030f1", "all");
+//addComments("65746638f2ab684128e030f1", "65746638f2ab684128e03133", 4, "good");
