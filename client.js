@@ -2,7 +2,6 @@ const axios = require("axios");
 
 console.log("client is running...");
 
-
 const getAvailableHouses = async (checkin, checkout, numOfGuest, houseType) => 
 {
     try 
@@ -74,15 +73,58 @@ const getHouseDetail = async (houseId, month) =>
         }
   
         console.log(`${month} 예약 현황:`);
-        const reservationResponse = await axios.get(`http://localhost:3000/reservation/byhouse/${houseId}/2023/${month}`);
-        const reservations = reservationResponse.data.reservations;
-        
-        reservations.forEach((reservation) => {
-            console.log(`체크인: ${reservation.checkin}`);
-            console.log(`체크아웃: ${reservation.checkout}`);
-            console.log(`인원 수: ${reservation.numOfGuest}`);
-            console.log("=====================");
-        });
+        const reservationResponse = await axios.get(`http://localhost:3000/house/detail?houseId=${houseId}&month=${month}`);
+        houseCalendar = reservationResponse.data.houseCalendar;
+
+        if(houseDetail.houseType == "WHOLE")
+        {
+            daysInMonth = new Date(2023, month, 0).getDate();
+            calendar = Array.from({ length: daysInMonth }, (_, i) => 0);
+          
+            houseCalendar.forEach((reservation) => 
+            {
+              const reservationDate = new Date(reservation.date).getDate();
+              calendar[reservationDate - 1] = 1;
+            });
+
+            for (let i = 1; i <= daysInMonth; i++) 
+            {
+              if (calendar[i - 1] === 1) 
+              {
+                process.stdout.write(" O ");
+              } else 
+              {
+                process.stdout.write(" X ");
+              }
+              if (i % 7 === 0) 
+              {
+                console.log("");
+              }
+            }
+        }
+        else
+        {
+            daysInMonth = new Date(2023, month, 0).getDate();
+            calendar = Array.from({ length: daysInMonth }, (_, i) => houseDetail.capacity);
+          
+            houseCalendar.forEach((reservation) => 
+            {
+              const reservationDate = new Date(reservation.date).getDate();
+              calendar[reservationDate - 1] = reservation.remain;
+            });
+          
+            for (let i = 1; i <= daysInMonth; i++) 
+            {
+              const value = calendar[i - 1];
+              process.stdout.write(`  ${value} `);
+          
+              if (i % 7 === 0) 
+              {
+                console.log("");
+              }
+            }
+
+        }
 
     }
     catch (error) 
@@ -221,11 +263,10 @@ const addComments = async (guestId, reserveId, starPoint, comment) =>
     }
 };
 
-
 //getAvailableHouses("2023-12-20", "2023-11-25", 2, "WHOLE");
-//getHouseDetail("6574853179b6daa5acf79749", 12); //예약현황 달력형식 추가 필요
-//bookHouse("6573139929a76d9482836259", "6574853179b6daa5acf79749","2023-12-01", "2023-12-05", 3);
-//bookHouse("6574853179b6daa5acf7973b", "6574853179b6daa5acf79749","2023-12-06", "2023-12-10", 3);
+//getHouseDetail("6576a2fce4175d5d4ec84696", 11); 
+//bookHouse("6576a2fce4175d5d4ec84685", "6576a2fce4175d5d4ec84693","2023-11-01", "2023-11-05", 3);
+//bookHouse("6576a2fce4175d5d4ec84685", "6576a2fce4175d5d4ec84696","2023-11-01", "2023-11-5", 7);
 //cancelReserve("6572ed198c9f166ec1952718");
 //getReservationHistory("65746638f2ab684128e030f1", "all");
 //addComments("65746638f2ab684128e030f1", "65746638f2ab684128e03133", 4, "good");
