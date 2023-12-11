@@ -206,14 +206,14 @@ const generateDummyData = async () => {
   for (let i = 0; i < reservations.length; i++) {
     if (i % numOfReservation > Math.round(numOfReservation / 2 - 1)) continue;
 
-    comments.push(
-      new Comment({
-        member: reservations[i].member,
-        house: reservations[i].house,
-        content: faker.lorem.sentence(),
-        score: 1 + Math.round(Math.random() * 4),
-      })
-    );
+    const newComment = new Comment({
+      member: reservations[i].member,
+      house: reservations[i].house,
+      content: faker.lorem.sentence(),
+      score: 1 + Math.round(Math.random() * 4),
+    });
+    comments.push(newComment);
+    reservations[i].comment = newComment;
   }
 
   // 작성된 리뷰에 따라 각 숙소 별점 계산
