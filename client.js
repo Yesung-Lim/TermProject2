@@ -87,6 +87,14 @@ const getHouseDetail = async (houseId, month) =>
               calendar[reservationDate - 1] = 1;
             });
 
+            console.log("일 월 화 수 목 금 토");
+
+            const firstDayOfWeek = new Date(2023, month - 1, 1).getDay(); 
+            for (let i = 0; i < firstDayOfWeek; i++)
+            {
+              process.stdout.write("   ");
+            }
+
             for (let i = 1; i <= daysInMonth; i++) 
             {
               if (calendar[i - 1] === 1) 
@@ -96,8 +104,7 @@ const getHouseDetail = async (houseId, month) =>
               {
                 process.stdout.write(" X ");
               }
-              if (i % 7 === 0) 
-              {
+              if ((firstDayOfWeek + i) % 7 === 0) {
                 console.log("");
               }
             }
@@ -112,20 +119,28 @@ const getHouseDetail = async (houseId, month) =>
               const reservationDate = new Date(reservation.date).getDate();
               calendar[reservationDate - 1] = reservation.remain;
             });
+
+            console.log("일 월 화 수 목 금 토");
+
+            const firstDayOfWeek = new Date(2023, month - 1, 1).getDay();
+            for (let i = 0; i < firstDayOfWeek; i++) 
+            {
+              process.stdout.write("   ");
+            }
           
             for (let i = 1; i <= daysInMonth; i++) 
             {
               const value = calendar[i - 1];
-              process.stdout.write(`  ${value} `);
+              process.stdout.write(` ${value} `);
           
-              if (i % 7 === 0) 
-              {
+              if ((firstDayOfWeek + i) % 7 === 0) {
                 console.log("");
               }
             }
 
         }
-
+        
+        console.log("");
     }
     catch (error) 
     {
@@ -264,7 +279,7 @@ const addComments = async (guestId, reserveId, starPoint, comment) =>
 };
 
 //getAvailableHouses("2023-12-20", "2023-11-25", 2, "WHOLE");
-//getHouseDetail("6576a2fce4175d5d4ec84696", 11); 
+getHouseDetail("6576bc9ec33d9a2b15d26ff0", 11); 
 //bookHouse("6576a2fce4175d5d4ec84685", "6576a2fce4175d5d4ec84693","2023-11-01", "2023-11-05", 3);
 //bookHouse("6576a2fce4175d5d4ec84685", "6576a2fce4175d5d4ec84696","2023-11-01", "2023-11-5", 7);
 //cancelReserve("6572ed198c9f166ec1952718");
