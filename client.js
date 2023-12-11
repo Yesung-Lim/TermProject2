@@ -3,7 +3,13 @@ const { ConvenienceTypes, HouseTypes, OrderTypes } = require("./types");
 
 console.log("client is running...");
 
-const getAvailableHouses = async (checkin, checkout, numOfGuest, houseType) => {
+const getAvailableHouses = async (
+  checkin,
+  checkout,
+  numOfGuest,
+  houseType,
+  orderType
+) => {
   try {
     const response = await axios.get("http://localhost:3000/house", {
       params: {
@@ -11,7 +17,7 @@ const getAvailableHouses = async (checkin, checkout, numOfGuest, houseType) => {
         checkout,
         numOfGuest,
         houseType,
-        orderType: "PRICE",
+        orderType,
       },
     });
 
@@ -41,15 +47,19 @@ const getHouseDetail = async (houseId, month) => {
     console.log("숙소 정보:");
     console.log(`이름: ${houseDetail.name}`);
     console.log(`타입: ${houseDetail.houseType}`);
-    console.log(`주소: ${houseDetail.address.city}, ${houseDetail.address.street}, ${houseDetail.address.zipCode}`);
-    console.log(`요금: ${houseDetail.charge.weekday}, ${houseDetail.charge.weekend}`);
-    console.log(`인원: ${houseDetail.capacity}`);
+    console.log(
+      `주소: ${houseDetail.address.city}, ${houseDetail.address.street}, ${houseDetail.address.zipCode}`
+    );
+    console.log(
+      `요금: ${houseDetail.charge.weekday}(주중), ${houseDetail.charge.weekend}(주말)`
+    );
+    console.log(`수용 가능 인원: ${houseDetail.capacity}`);
     console.log(`화장실 개수: ${houseDetail.numOfBath}`);
     console.log(`평균 별점: ${houseDetail.avgScore}`);
     console.log(`편의시설: ${houseDetail.conveniences.category.join(", ")}`);
     console.log("=====================");
     console.log("숙소 리뷰 정보:");
-     
+
     if (houseDetail.comments && houseDetail.comments.length > 0) {
       houseDetail.comments.forEach((comment) => {
         console.log(`작성자: ${comment.member.name}`);
@@ -77,18 +87,20 @@ const getHouseDetail = async (houseId, month) => {
         calendar[reservationDate - 1] = 1;
       });
 
-      console.log("   일    월    화    수    목    금    토");
+      console.log(
+        "     일      월       화       수       목      금       토"
+      );
 
       const firstDayOfWeek = new Date(2023, month - 1, 1).getDay();
       for (let i = 0; i < firstDayOfWeek; i++) {
-        process.stdout.write("      ");
+        process.stdout.write("         ");
       }
 
       for (let i = 1; i <= daysInMonth; i++) {
         if (calendar[i - 1] === 1) {
-          process.stdout.write(`${i < 10 ? `  ${i}.` : ` ${i}.`}O `);
+          process.stdout.write(`${i < 10 ? `  ${i}일` : ` ${i}일`}(O) `);
         } else {
-          process.stdout.write(`${i < 10 ? `  ${i}.` : ` ${i}.`}X `);
+          process.stdout.write(`${i < 10 ? `  ${i}일` : ` ${i}일`}(*) `);
         }
         if ((firstDayOfWeek + i) % 7 === 0) {
           console.log("");
@@ -106,16 +118,18 @@ const getHouseDetail = async (houseId, month) => {
         calendar[reservationDate - 1] = reservation.remain;
       });
 
-      console.log("   일    월    화    수    목    금    토");
+      console.log(
+        "     일      월       화      수       목       금       토"
+      );
 
       const firstDayOfWeek = new Date(2023, month - 1, 1).getDay();
       for (let i = 0; i < firstDayOfWeek; i++) {
-        process.stdout.write("      ");
+        process.stdout.write("         ");
       }
 
       for (let i = 1; i <= daysInMonth; i++) {
         const value = calendar[i - 1];
-        process.stdout.write(`${i < 10 ? `  ${i}.` : ` ${i}.`}${value} `);
+        process.stdout.write(`${i < 10 ? `  ${i}일` : ` ${i}일`}(${value}) `);
 
         if ((firstDayOfWeek + i) % 7 === 0) {
           console.log("");
@@ -182,15 +196,22 @@ const getReservationHistory = async (guestId, findType) => {
       const checkout = "체크아웃";
       const charge = "요금";
       const review = "후기";
-      
-      console.log(`${title.padStart()}${checkin.padStart(21)}${checkout.padStart(30)}${charge.padStart(30)}${review.padStart(10)}`);
-      
+
+      console.log(
+        `${title.padStart()}${checkin.padStart(21)}${checkout.padStart(
+          30
+        )}${charge.padStart(30)}${review.padStart(10)}`
+      );
+
       data.reservations.forEach((reservation) => {
         console.log(
-          `${reservation.house.name.padStart()}\t${reservation.checkin.padStart(10)}\t${reservation.checkout.padStart(10)}\t${reservation.charge.toString().padStart(10)}\t${reservation.comment ? "O" : "X"}`
+          `${reservation.house.name.padStart()}\t${reservation.checkin.padStart(
+            10
+          )}\t${reservation.checkout.padStart(10)}\t${reservation.charge
+            .toString()
+            .padStart(10)}\t${reservation.comment ? "O" : "X"}`
         );
       });
-      
     } else {
       console.error("예약 내역 조회 실패:", data.message);
     }
@@ -248,8 +269,8 @@ const addComments = async (guestId, reserveId, starPoint, comment) => {
   }
 };
 
-// getAvailableHouses("2023-11-20", "2023-11-25", 2, HouseTypes.PRIVATE);
-//getHouseDetail("657710c0cf45f9fbb38aabcb", 11);
+// getAvailableHouses("2023-11-20", "2023-11-25", 2, HouseTypes.PRIVATE, OrderTypes.PRICE);
+// getHouseDetail("65771272be922cd262bb26d2", 11);
 // bookHouse("6576cffed5c0c9819047ce45", "6576cffed5c0c9819047ce53","2023-11-01", "2023-11-05", 3);
 // bookHouse("6576a2fce4175d5d4ec84685", "6576a2fce4175d5d4ec84696","2023-11-01", "2023-11-5", 7);
 // cancelReserve("6576d18dd5c0c9819047cfa6");
