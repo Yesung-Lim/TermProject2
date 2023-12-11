@@ -36,18 +36,20 @@ const getHouseDetail = async (houseId, month) => {
         month,
       },
     });
-
+    //console.log(response.data);
     const houseDetail = response.data;
-    console.log("숙소 기본 정보:");
+    console.log("숙소 정보:");
     console.log(`이름: ${houseDetail.name}`);
     console.log(`타입: ${houseDetail.houseType}`);
-    console.log(
-      `주소: ${houseDetail.address.street}, ${houseDetail.address.city}`
-    );
+    console.log(`주소: ${houseDetail.address.city}, ${houseDetail.address.street}, ${houseDetail.address.zipCode}`);
+    console.log(`요금: ${houseDetail.charge.weekday}, ${houseDetail.charge.weekend}`);
+    console.log(`인원: ${houseDetail.capacity}`);
+    console.log(`화장실 개수: ${houseDetail.numOfBath}`);
+    console.log(`평균 별점: ${houseDetail.avgScore}`);
     console.log(`편의시설: ${houseDetail.conveniences.category.join(", ")}`);
     console.log("=====================");
     console.log("숙소 리뷰 정보:");
-
+     
     if (houseDetail.comments && houseDetail.comments.length > 0) {
       houseDetail.comments.forEach((comment) => {
         console.log(`작성자: ${comment.member.name}`);
@@ -75,18 +77,18 @@ const getHouseDetail = async (houseId, month) => {
         calendar[reservationDate - 1] = 1;
       });
 
-      console.log("일 월 화 수 목 금 토");
+      console.log("   일    월    화    수    목    금    토");
 
       const firstDayOfWeek = new Date(2023, month - 1, 1).getDay();
       for (let i = 0; i < firstDayOfWeek; i++) {
-        process.stdout.write("   ");
+        process.stdout.write("      ");
       }
 
       for (let i = 1; i <= daysInMonth; i++) {
         if (calendar[i - 1] === 1) {
-          process.stdout.write(" O ");
+          process.stdout.write(`${i < 10 ? `  ${i}.` : ` ${i}.`}O `);
         } else {
-          process.stdout.write(" X ");
+          process.stdout.write(`${i < 10 ? `  ${i}.` : ` ${i}.`}X `);
         }
         if ((firstDayOfWeek + i) % 7 === 0) {
           console.log("");
@@ -104,16 +106,16 @@ const getHouseDetail = async (houseId, month) => {
         calendar[reservationDate - 1] = reservation.remain;
       });
 
-      console.log("일 월 화 수 목 금 토");
+      console.log("   일    월    화    수    목    금    토");
 
       const firstDayOfWeek = new Date(2023, month - 1, 1).getDay();
       for (let i = 0; i < firstDayOfWeek; i++) {
-        process.stdout.write("   ");
+        process.stdout.write("      ");
       }
 
       for (let i = 1; i <= daysInMonth; i++) {
         const value = calendar[i - 1];
-        process.stdout.write(` ${value} `);
+        process.stdout.write(`${i < 10 ? `  ${i}.` : ` ${i}.`}${value} `);
 
         if ((firstDayOfWeek + i) % 7 === 0) {
           console.log("");
@@ -175,15 +177,20 @@ const getReservationHistory = async (guestId, findType) => {
 
     if (response.ok) {
       console.log("[숙박 완료 리스트]");
-      console.log("숙소명\t\t\t체크인\t\t\t\t체크아웃\t\t\t요금\t후기");
-
+      const title = "숙소명";
+      const checkin = "체크인";
+      const checkout = "체크아웃";
+      const charge = "요금";
+      const review = "후기";
+      
+      console.log(`${title.padStart()}${checkin.padStart(21)}${checkout.padStart(30)}${charge.padStart(30)}${review.padStart(10)}`);
+      
       data.reservations.forEach((reservation) => {
         console.log(
-          `${reservation.house.name}\t${reservation.checkin}\t${
-            reservation.checkout
-          }\t${reservation.charge}\t${reservation.comment ? "O" : "X"}`
+          `${reservation.house.name.padStart()}\t${reservation.checkin.padStart(10)}\t${reservation.checkout.padStart(10)}\t${reservation.charge.toString().padStart(10)}\t${reservation.comment ? "O" : "X"}`
         );
       });
+      
     } else {
       console.error("예약 내역 조회 실패:", data.message);
     }
@@ -242,9 +249,9 @@ const addComments = async (guestId, reserveId, starPoint, comment) => {
 };
 
 // getAvailableHouses("2023-11-20", "2023-11-25", 2, HouseTypes.PRIVATE);
-// getHouseDetail("6576cffed5c0c9819047ce53", 11);
+//getHouseDetail("657710c0cf45f9fbb38aabcb", 11);
 // bookHouse("6576cffed5c0c9819047ce45", "6576cffed5c0c9819047ce53","2023-11-01", "2023-11-05", 3);
 // bookHouse("6576a2fce4175d5d4ec84685", "6576a2fce4175d5d4ec84696","2023-11-01", "2023-11-5", 7);
 // cancelReserve("6576d18dd5c0c9819047cfa6");
-getReservationHistory("6576d4ca8e0b00a6d8af57c0", "all");
+//getReservationHistory("657710c0cf45f9fbb38aabbe", "all");
 // addComments("6576d4ca8e0b00a6d8af57c0", "6576d4ca8e0b00a6d8af57fb", 4, "good");
