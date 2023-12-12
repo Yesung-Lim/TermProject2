@@ -269,10 +269,45 @@ const addComments = async (guestId, reserveId, starPoint, comment) => {
   }
 };
 
+const check3 = (guestId, wholeHouse, privateHouse) => {
+  getReservationHistory(guestId, "all");
+  bookHouse(guestId, wholeHouse, "2023-11-01", "2023-11-05", 1);
+  bookHouse(guestId, privateHouse, "2023-11-01", "2023-11-05", 1);
+  getReservationHistory(guestId, "all");
+};
+
+const check4 = (guestId, privateHouse, reserveId) => {
+  getReservationHistory(guestId, "all");
+  getHouseDetail(privateHouse, 11);
+  cancelReserve(reserveId);
+  getReservationHistory(guestId, "all");
+  getHouseDetail(privateHouse, 11);
+};
+
+const check6 = (guestId, wholeHouse, wholeReserveId, starPoint, comment) => {
+  getHouseDetail(wholeHouse, 11);
+  addComments(guestId, wholeReserveId, starPoint, comment);
+  getHouseDetail(wholeHouse, 11);
+};
+
+// 검사항목 1
 // getAvailableHouses("2023-11-20", "2023-11-25", 2, HouseTypes.PRIVATE, OrderTypes.PRICE);
-// getHouseDetail("65771272be922cd262bb26d2", 11);
-// bookHouse("6576cffed5c0c9819047ce45", "6576cffed5c0c9819047ce53","2023-11-01", "2023-11-05", 3);
-// bookHouse("6576a2fce4175d5d4ec84685", "6576a2fce4175d5d4ec84696","2023-11-01", "2023-11-5", 7);
-// cancelReserve("6576d18dd5c0c9819047cfa6");
-//getReservationHistory("657710c0cf45f9fbb38aabbe", "all");
-// addComments("6576d4ca8e0b00a6d8af57c0", "6576d4ca8e0b00a6d8af57fb", 4, "good");
+
+const guestId = "";
+const wholeHouse = "";
+const privateHouse = "";
+
+// 검사항목 2
+// getHouseDetail(wholeHouse, 11);
+
+// 검사항목 3 & 5
+// check3(guestId, wholeHouse, privateHouse);
+
+const wholeReserveId = ""; // 위에서 예약한 것 중, 전체 예약 ID
+const privateReserveId = ""; // 위에서 예약한 것 중, 개인실 예약 ID
+
+// 검사항목 4 & 5
+// check4(guestId, privateHouse, privateReserveId);
+
+// 검사항목 6
+// check6(guestId, wholeHouse, wholeReserveId, 4, "아주 아주 아주 좋습니다");
