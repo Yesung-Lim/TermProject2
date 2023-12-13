@@ -127,7 +127,7 @@ const generateDummyData = async () => {
         },
         member: hosts[Math.floor(Math.random() * numOfHost)],
         capacity,
-        houseType: i < numOfHost / 2 ? HouseTypes.WHOLE : HouseTypes.PRIVATE,
+        houseType: i < numOfHouse / 2 ? HouseTypes.WHOLE : HouseTypes.PRIVATE,
         numOfBath: 1 + Math.round((Math.random() * capacity) / 2),
         avgScore: 0,
       })
