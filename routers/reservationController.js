@@ -36,7 +36,7 @@ router.post("/", async (req, res) => {
     if (!houseDetails) {
       return res
         .status(404)
-        .json({ message: "숙소를 찾을 수 없습니다." , houseDetails});
+        .json({ message: "숙소를 찾을 수 없습니다.", houseDetails });
     }
 
     const weekdayRate = houseDetails.charge.weekday;
@@ -69,7 +69,7 @@ router.post("/", async (req, res) => {
 
     const dates = [];
     let currentDate = new Date(checkin);
-    while (currentDate <= checkout) {
+    while (currentDate < checkout) {
       dates.push(new Date(currentDate));
       currentDate.setDate(currentDate.getDate() + 1);
     }
@@ -113,7 +113,7 @@ router.delete("/cancle", async (req, res) => {
     const dates = [];
     let currentDate = new Date(checkin);
 
-    while (currentDate <= checkout) {
+    while (currentDate < checkout) {
       dates.push(new Date(currentDate));
       currentDate.setDate(currentDate.getDate() + 1);
     }
@@ -190,21 +190,16 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/byhouse/:houseId/:year/:month", async (req, res) => 
-{
+router.get("/byhouse/:houseId/:year/:month", async (req, res) => {
   const houseId = req.params.houseId;
   const year = parseInt(req.params.year);
   const month = parseInt(req.params.month);
 
-  try 
-  {
-    const reservations = await Reservation.find
-    ({
+  try {
+    const reservations = await Reservation.find({
       house: houseId,
-      $expr: 
-      {
-        $and: 
-        [
+      $expr: {
+        $and: [
           { $eq: [{ $year: "$checkin" }, year] },
           { $eq: [{ $month: "$checkin" }, month] },
         ],
@@ -213,14 +208,13 @@ router.get("/byhouse/:houseId/:year/:month", async (req, res) =>
       .populate("house")
       .sort({ checkin: -1 });
 
-    if (reservations.length === 0) 
-    {
-      return res.status(404).json({ message: "해당 숙소에 대한 해당 월의 예약이 없습니다." });
+    if (reservations.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "해당 숙소에 대한 해당 월의 예약이 없습니다." });
     }
     res.status(200).json({ reservations });
-  } 
-  catch (err) 
-  {
+  } catch (err) {
     res.status(500).json({ message: "예약 조회 실패", error: err.message });
   }
 });
